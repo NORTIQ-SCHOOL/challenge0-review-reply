@@ -1,0 +1,24 @@
+# 自動採点のワークフロー（運営が用意したもの。書き換えなくてOK）
+# push やプルリクエストのたびに採点し、結果を Actions の「Summary」に表示します。
+name: autograde
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 依存パッケージを入れる
+        run: pip install -r requirements-dev.txt
+      - name: 自動採点
+        run: python grader/grade.py --repo . --summary "$GITHUB_STEP_SUMMARY"
